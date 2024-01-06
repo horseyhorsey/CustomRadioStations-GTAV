@@ -1,4 +1,6 @@
-﻿using System.IO;
+﻿using System.Collections.Generic;
+using System.IO;
+using System.Linq;
 using System.Reflection;
 
 public class PathHelper
@@ -26,4 +28,9 @@ public class PathHelper
         return fullPathAndFilename.Length <= MaxPathLength;
     }
 
+    public static string MakeValidFileName(string original, char replacementChar = '_')
+    {
+        var invalidChars = new HashSet<char>(System.IO.Path.GetInvalidFileNameChars());
+        return new string(original.Select(c => invalidChars.Contains(c) ? replacementChar : c).ToArray());
+    }
 }
