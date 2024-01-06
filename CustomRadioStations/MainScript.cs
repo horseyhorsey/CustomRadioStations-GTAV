@@ -317,6 +317,117 @@ namespace CustomRadioStations
             }
         }
 
+        void OnPlayerEnteredVehicle(Vehicle veh)
+        {
+            bool vehWasEngineRunning = veh.IsEngineRunning;
+
+            // Make vanilla radio silent
+            RadioNativeFunctions.VanillaRadioFadedOut(true);
+
+            DateTime enteredTime = DateTime.Now;
+
+            while (!veh.IsEngineRunning || DateTime.Now > enteredTime.AddSeconds(10))
+            {
+                //UI.ShowSubtitle((enteredTime.AddSeconds(10) - DateTime.Now).TotalMilliseconds.ToString());
+                vehWasEngineRunning = false;
+                Yield();
+            }
+
+            // In case the timeout above caused the loop to break,
+            // We will not continue because the vehicle is dead.
+            if (!veh.IsEngineRunning) return;
+
+            if (UsedVehiclesManager.IsUsedVehicle(veh))
+            {
+                canResumeCustomStation = false;
+
+                if (UsedVehiclesManager.GetVehicleStationInfo(veh) == null)
+                {
+                    // Make vanilla radio audible
+                    RadioNativeFunctions.VanillaRadioFadedOut(false);
+
+                    canResumeCustomStation = false;
+                    lastRadioWasCustom = false;
+                    return;
+                }
+
+                ActionQueued = ActionOptions.PlayQueued;
+
+                UsedVehiclesManager.SetLastStationNow(veh);
+
+                SetActionDelay(Config.WheelActionDelay + 300);
+
+                lastRadioWasCustom = true;
+
+                //UI.ShowSubtitle("Started playback");
+            }
+            else
+            {
+                // If the engine was running, don't mess with it.
+                // Since I can't figure out how to see if a vehicle
+                // was emitting a station, I'll just not mess with it.
+                if (vehWasEngineRunning)
+                {
+                    //UI.ShowSubtitle("RADIO IS ENABLED: " + RadioNativeFunctions.GET_PLAYER_RADIO_STATION_INDEX().ToString());
+
+                    // Make vanilla radio audible
+                    RadioNativeFunctions.VanillaRadioFadedOut(false);
+
+                    canResumeCustomStation = false;
+                    lastRadioWasCustom = false;
+                    return;
+                }
+
+                int chooseRandom = RadioStation.random.Next(10);
+                //UI.ShowSubtitle("RANDOM: " + chooseRandom.ToString());
+                // 70% chance to play a custom station.
+                if (chooseRandom >= 3)
+                {
+                    ActionQueued = ActionOptions.PlayQueued;
+
+                    // Set the queued radio station randomly, chosen from stationPairList.
+                    chooseRandom = RadioStation.random.Next(StationWheelPair.List.Count);
+
+                    UsedVehiclesManager.UpdateVehicleWithStationInfo(veh,
+                        StationWheelPair.List[chooseRandom]);
+
+                    UsedVehiclesManager.SetLastStationNow(veh);
+
+                    SetActionDelay(Config.WheelActionDelay + 300);
+
+                    canResumeCustomStation = false;
+                    lastRadioWasCustom = true;
+                }
+                else
+                {
+                    UsedVehiclesManager.UpdateVehicleWithStationInfo(veh, null);
+
+                    // Make vanilla radio audible
+                    RadioNativeFunctions.VanillaRadioFadedOut(false);
+
+                    canResumeCustomStation = false;
+                    lastRadioWasCustom = false;
+                }
+            }
+        }
+
+        void OnPlayerExitedVehicle(Vehicle veh)
+        {
+            if (veh == null) return;
+
+            /*if (!IsMobileRadioEnabled())
+            {
+                lastRadioWasCustom = IsCurrentCustomStationPlaying() ? true : false;
+            }*/
+
+            // Make vanilla radio audible
+            RadioNativeFunctions.VanillaRadioFadedOut(false);
+
+            UsedVehiclesManager.UpdateVehicleWithStationInfo(veh,
+                lastRadioWasCustom ? StationWheelPair.List.Find(x => x.Category == WheelVars.CurrentRadioWheel.SelectedCategory)
+                : null);
+        }
+
         void OnTick(object sender, EventArgs e)
         {
             if (!loaded)
@@ -410,118 +521,12 @@ namespace CustomRadioStations
             inputTimer = DateTime.Now.AddMilliseconds(ms);
         }
 
+        /// <summary> Sets up the Player Enter / Exit event handlers. See <see cref="GeneralEvents"/> </summary>
         void SetupEvents()
         {
-            GeneralEvents.OnPlayerEnteredVehicle += (veh) =>
-            {
-                bool vehWasEngineRunning = veh.IsEngineRunning;
+            GeneralEvents.OnPlayerEnteredVehicle += (veh) => OnPlayerEnteredVehicle(veh);
 
-                // Make vanilla radio silent
-                RadioNativeFunctions.VanillaRadioFadedOut(true);
-
-                DateTime enteredTime = DateTime.Now;
-
-                while (!veh.IsEngineRunning || DateTime.Now > enteredTime.AddSeconds(10))
-                {
-                    //UI.ShowSubtitle((enteredTime.AddSeconds(10) - DateTime.Now).TotalMilliseconds.ToString());
-                    vehWasEngineRunning = false;
-                    Yield();
-                }
-
-                // In case the timeout above caused the loop to break,
-                // We will not continue because the vehicle is dead.
-                if (!veh.IsEngineRunning) return;
-
-                if (UsedVehiclesManager.IsUsedVehicle(veh))
-                {
-                    canResumeCustomStation = false;
-
-                    if (UsedVehiclesManager.GetVehicleStationInfo(veh) == null)
-                    {
-                        // Make vanilla radio audible
-                        RadioNativeFunctions.VanillaRadioFadedOut(false);
-
-                        canResumeCustomStation = false;
-                        lastRadioWasCustom = false;
-                        return;
-                    }
-
-                    ActionQueued = ActionOptions.PlayQueued;
-
-                    UsedVehiclesManager.SetLastStationNow(veh);
-
-                    SetActionDelay(Config.WheelActionDelay + 300);
-
-                    lastRadioWasCustom = true;
-
-                    //UI.ShowSubtitle("Started playback");
-                }
-                else
-                {
-                    // If the engine was running, don't mess with it.
-                    // Since I can't figure out how to see if a vehicle
-                    // was emitting a station, I'll just not mess with it.
-                    if (vehWasEngineRunning)
-                    {
-                        //UI.ShowSubtitle("RADIO IS ENABLED: " + RadioNativeFunctions.GET_PLAYER_RADIO_STATION_INDEX().ToString());
-
-                        // Make vanilla radio audible
-                        RadioNativeFunctions.VanillaRadioFadedOut(false);
-
-                        canResumeCustomStation = false;
-                        lastRadioWasCustom = false;
-                        return;
-                    }
-
-                    int chooseRandom = RadioStation.random.Next(10);
-                    //UI.ShowSubtitle("RANDOM: " + chooseRandom.ToString());
-                    // 70% chance to play a custom station.
-                    if (chooseRandom >= 3)
-                    {
-                        ActionQueued = ActionOptions.PlayQueued;
-
-                        // Set the queued radio station randomly, chosen from stationPairList.
-                        chooseRandom = RadioStation.random.Next(StationWheelPair.List.Count);
-
-                        UsedVehiclesManager.UpdateVehicleWithStationInfo(veh,
-                            StationWheelPair.List[chooseRandom]);
-
-                        UsedVehiclesManager.SetLastStationNow(veh);
-
-                        SetActionDelay(Config.WheelActionDelay + 300);
-
-                        canResumeCustomStation = false;
-                        lastRadioWasCustom = true;
-                    }
-                    else
-                    {
-                        UsedVehiclesManager.UpdateVehicleWithStationInfo(veh, null);
-
-                        // Make vanilla radio audible
-                        RadioNativeFunctions.VanillaRadioFadedOut(false);
-
-                        canResumeCustomStation = false;
-                        lastRadioWasCustom = false;
-                    }
-                }
-            };
-
-            GeneralEvents.OnPlayerExitedVehicle += (veh) =>
-            {
-                if (veh == null) return;
-
-                /*if (!IsMobileRadioEnabled())
-                {
-                    lastRadioWasCustom = IsCurrentCustomStationPlaying() ? true : false;
-                }*/
-
-                // Make vanilla radio audible
-                RadioNativeFunctions.VanillaRadioFadedOut(false);
-
-                UsedVehiclesManager.UpdateVehicleWithStationInfo(veh,
-                    lastRadioWasCustom ? StationWheelPair.List.Find(x => x.Category == WheelVars.CurrentRadioWheel.SelectedCategory)
-                    : null);
-            };
+            GeneralEvents.OnPlayerExitedVehicle += (veh) => OnPlayerExitedVehicle(veh);
 
             /*GeneralEvents.OnPlayerVehicleEngineTurnedOn += (veh) =>
             {
@@ -540,7 +545,6 @@ namespace CustomRadioStations
                 }
             };*/
         }
-
         void SetupRadio()
         {
             // Get folders in script's main folder "Custom Radio Stations"
@@ -574,7 +578,8 @@ namespace CustomRadioStations
                     Logger.Log("Loading " + stationDir);
 
                     // Get all files that have the above-mentioned extensions.
-                    var musicFilePaths = Directory.GetFiles(stationDir, "*.*", SearchOption.TopDirectoryOnly)
+                    var musicFilePaths = Directory
+                        .GetFiles(stationDir, "*.*", SearchOption.TopDirectoryOnly)
                         .Where(x => extensions.Contains(Path.GetExtension(x)));
 
                     // Don't make a station out of an empty folder
@@ -587,15 +592,19 @@ namespace CustomRadioStations
                     // Increase count
                     populatedStationCount++;
 
-                    WheelCategory stationCat = new WheelCategory(Path.GetFileName(stationDir));
-                    radioWheel.AddCategory(stationCat);
-                    WheelCategoryItem stationItem = new WheelCategoryItem(stationCat.Name);
-                    stationCat.AddItem(stationItem);
+                    // Add Wheel Cat
+                    WheelCategory wheelCat = new WheelCategory(Path.GetFileName(stationDir));
+                    radioWheel.AddCategory(wheelCat);
 
-                    RadioStation station = new RadioStation(stationCat, musicFilePaths);
+                    // Add Wheel Cat Item
+                    WheelCategoryItem wheelItem = new WheelCategoryItem(wheelCat.Name);
+                    wheelCat.AddItem(wheelItem);
+
+                    // Create station from Wheel cat
+                    RadioStation station = new RadioStation(wheelCat, musicFilePaths);
 
                     // Add wheel category-station combo to a station list
-                    StationWheelPair pair = new StationWheelPair(radioWheel, stationCat, station);
+                    StationWheelPair pair = new StationWheelPair(radioWheel, wheelCat, station);
                     StationWheelPair.List.Add(pair);
 
                     // Get description
@@ -607,7 +616,7 @@ namespace CustomRadioStations
                         // So we will only use this anonymous method for when the station is actually changed.
                         //if (wheelJustOpened) return;
 
-                        if (selectedCategory == stationCat)
+                        if (selectedCategory == wheelCat)
                         {
                             // If there is no input for a short amount of time, set the selected station as next to play
                             ActionQueued = ActionOptions.PlayQueued;
