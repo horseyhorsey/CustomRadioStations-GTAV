@@ -13,13 +13,7 @@ using System.Diagnostics;
 namespace CustomRadioStations
 {
     public class MainScript : Script
-    {
-        public const string mainPath = @"scripts\Custom Radio Stations\";
-
-        public static string iconBgPath = @"scripts\Custom Radio Stations\iconbg.png";
-
-        public static string iconhighlightPath = @"scripts\Custom Radio Stations\iconhl.png";
-
+    {       
         bool canResumeCustomStation;
 
         bool lastPlayedOnFoot;
@@ -58,6 +52,9 @@ namespace CustomRadioStations
             Interval = 10;
         }
 
+        /// <summary> Disposes of IKlang, removes any timecyclyes</summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
         private void OnAbort(object sender, EventArgs e)
         {
             Game.TimeScale = 1f;
@@ -79,7 +76,7 @@ namespace CustomRadioStations
         public void SetupRadio()
         {
             // Get folders in script's main folder "Custom Radio Stations"
-            string[] wheelDirectories = Directory.GetDirectories(mainPath, "*", SearchOption.TopDirectoryOnly);
+            string[] wheelDirectories = Directory.GetDirectories(Constants.MAIN_PATH, "*", SearchOption.TopDirectoryOnly);
 
             foreach (var wheelDir in wheelDirectories)
             {
@@ -180,7 +177,7 @@ namespace CustomRadioStations
                 {
                     WheelVars.RadioWheels.Add(radioWheel);
                     radioWheel.Origin = new Vector2(0.5f, 0.45f);
-                    radioWheel.SetCategoryBackgroundIcons(iconBgPath, Config.IconBG, Config.IconBgSizeMultiple, iconhighlightPath, Config.IconHL, Config.IconHlSizeMultiple);
+                    radioWheel.SetCategoryBackgroundIcons(Constants.ICON_BG_PATH, Config.IconBG, Config.IconBgSizeMultiple, Constants.ICON_HL_PATH, Config.IconHL, Config.IconHlSizeMultiple);
                     radioWheel.CalculateCategoryPlacement();
                 }
 

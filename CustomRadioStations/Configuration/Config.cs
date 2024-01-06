@@ -147,7 +147,7 @@ namespace CustomRadioStations
 
                 pair.Wheel.TextureSize = new Size(wheelIni.iconX, wheelIni.iconY);
                 pair.Wheel.Radius = wheelIni.wheelRadius;
-                pair.Wheel.SetCategoryBackgroundIcons(MainScript.iconBgPath, IconBG, IconBgSizeMultiple, MainScript.iconhighlightPath, IconHL, IconHlSizeMultiple);
+                pair.Wheel.SetCategoryBackgroundIcons(Constants.ICON_BG_PATH, IconBG, IconBgSizeMultiple, Constants.ICON_HL_PATH, IconHL, IconHlSizeMultiple);
             }
         }
 
