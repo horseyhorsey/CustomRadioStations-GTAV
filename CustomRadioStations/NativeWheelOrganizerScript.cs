@@ -9,15 +9,14 @@ namespace CustomRadioStations
 {
     public class NativeWheelOrganizerScript : Script
     {
+        GTA.Control ControlNextWheel;
+        GTA.Control ControlPrevWheel;
         NativeWheel currentWheel;
 
-        List<string> validStationNames;
-
-        int maxStationCount;
-
         bool Event_JUST_OPENED_OnNextOpen = true;
-
         bool loaded;
+        int maxStationCount;
+        List<string> validStationNames;
 
         public NativeWheelOrganizerScript()
         {
@@ -29,49 +28,32 @@ namespace CustomRadioStations
             Interval = 10;
         }
 
-        private void OnAbort(object sender, EventArgs e)
+        void ControlWheelChange()
         {
-            UnhideAllStations();
-        }
+            if (!WheelListIsPopulated()) return;
 
-        void UnhideAllStations()
-        {
-            for (int i = 0; i < maxStationCount; i++)
+            if (Game.IsControlJustPressed(ControlNextWheel))
             {
-                RadioNativeFunctions._LOCK_RADIO_STATION(RadioNativeFunctions.GET_RADIO_STATION_NAME(i), false);
+                currentWheel = NativeWheel.WheelList.GetNext(currentWheel);
+                UpdateWheelThisFrame();
+            }
+            else if (Game.IsControlJustPressed(ControlPrevWheel))
+            {
+                currentWheel = NativeWheel.WheelList.GetPrevious(currentWheel);
+                UpdateWheelThisFrame();
             }
         }
 
-        void LogAllStations()
+        void DisableNativeScrollRadioControls()
         {
-            Logger.Init(Constants.NLOG_PATH);
-
-            Logger.Log("Game version: " + Game.Version.ToString(), Constants.NLOG_PATH);
-            if ((int)Game.Version < (int)GameVersion.v1_0_1493_1_Steam)
-                Logger.Log("WARNING: Can't use the native radio wheel organizer on this game version. " +
-                    "Please update to 1.0.1493.0 or higher.");
-
-            Logger.Log("Checking all native and add-on radios...", Constants.NLOG_PATH);
-
-            maxStationCount = RadioNativeFunctions._MAX_RADIO_STATION_INDEX();
-
-            validStationNames = new List<string>();
-
-            for (int i = 0; i < maxStationCount; i++)
-            {
-                string stationName = RadioNativeFunctions.GET_RADIO_STATION_NAME(i);
-                validStationNames.Add(stationName);
-                string s = "Name: " + stationName + " || Proper name: " + RadioNativeFunctions.GetRadioStationProperName(i);
-                Logger.Log(s, Constants.NLOG_PATH);
-            }
-
-            Logger.Log("Please use the 'Name' name for your wheel organization lists (NativeWheels.cfg)! 'Proper name' is only for display purposes.", Constants.NLOG_PATH);
+            Game.DisableControlThisFrame(GTA.Control.VehicleNextRadio);
+            Game.DisableControlThisFrame(GTA.Control.VehiclePrevRadio);
         }
 
         void GetOrganizationLists()
         {
             if (!File.Exists(Constants.NLOG_CFG_PATH)) return;
-            
+
             string[] lines = File.ReadAllLines(Constants.NLOG_CFG_PATH);
 
             bool lastLineWasWheelName = false;
@@ -113,9 +95,54 @@ namespace CustomRadioStations
             }
         }
 
-        bool WheelListIsPopulated()
+        void LogAllStations()
         {
-            return NativeWheel.WheelList.Count > 0;
+            Logger.Init(Constants.NLOG_PATH);
+
+            Logger.Log("Game version: " + Game.Version.ToString(), Constants.NLOG_PATH);
+            if ((int)Game.Version < (int)GameVersion.v1_0_1493_1_Steam)
+                Logger.Log("WARNING: Can't use the native radio wheel organizer on this game version. " +
+                    "Please update to 1.0.1493.0 or higher.");
+
+            Logger.Log("Checking all native and add-on radios...", Constants.NLOG_PATH);
+
+            maxStationCount = RadioNativeFunctions._MAX_RADIO_STATION_INDEX();
+
+            validStationNames = new List<string>();
+
+            for (int i = 0; i < maxStationCount; i++)
+            {
+                string stationName = RadioNativeFunctions.GET_RADIO_STATION_NAME(i);
+                validStationNames.Add(stationName);
+                string s = "Name: " + stationName + " || Proper name: " + RadioNativeFunctions.GetRadioStationProperName(i);
+                Logger.Log(s, Constants.NLOG_PATH);
+            }
+
+            Logger.Log("Please use the 'Name' name for your wheel organization lists (NativeWheels.cfg)! 'Proper name' is only for display purposes.", Constants.NLOG_PATH);
+        }
+
+        private void OnAbort(object sender, EventArgs e)
+        {
+            UnhideAllStations();
+        }
+
+        void OnJustClosed()
+        {
+            //UI.ShowSubtitle("Just Closed");
+        }
+
+        void OnJustOpened()
+        {
+            //UI.ShowSubtitle("Just Opened");
+            UpdateWheelThisFrame();
+        }
+
+        void OnKeyDown(object sender, KeyEventArgs e)
+        {
+        }
+
+        void OnKeyUp(object sender, KeyEventArgs e)
+        {
         }
 
         void OnTick(object sender, EventArgs e)
@@ -164,8 +191,6 @@ namespace CustomRadioStations
             }
         }
 
-        GTA.Control ControlNextWheel;
-        GTA.Control ControlPrevWheel;
         void ShowHelpTexts()
         {
             ControlNextWheel = ControlHelper.UsingGamepad() ? GTA.Control.VehicleAccelerate : GTA.Control.WeaponWheelPrev;
@@ -189,25 +214,11 @@ namespace CustomRadioStations
                 false);
         }
 
-        void DisableNativeScrollRadioControls()
+        void UnhideAllStations()
         {
-            Game.DisableControlThisFrame(GTA.Control.VehicleNextRadio);
-            Game.DisableControlThisFrame(GTA.Control.VehiclePrevRadio);
-        }
-
-        void ControlWheelChange()
-        {
-            if (!WheelListIsPopulated()) return;
-
-            if (Game.IsControlJustPressed(ControlNextWheel))
+            for (int i = 0; i < maxStationCount; i++)
             {
-                currentWheel = NativeWheel.WheelList.GetNext(currentWheel);
-                UpdateWheelThisFrame();
-            }
-            else if (Game.IsControlJustPressed(ControlPrevWheel))
-            {
-                currentWheel = NativeWheel.WheelList.GetPrevious(currentWheel);
-                UpdateWheelThisFrame();
+                RadioNativeFunctions._LOCK_RADIO_STATION(RadioNativeFunctions.GET_RADIO_STATION_NAME(i), false);
             }
         }
 
@@ -231,36 +242,9 @@ namespace CustomRadioStations
             }
         }
 
-        void OnJustOpened()
+        bool WheelListIsPopulated()
         {
-            //UI.ShowSubtitle("Just Opened");
-            UpdateWheelThisFrame();
+            return NativeWheel.WheelList.Count > 0;
         }
-
-        void OnJustClosed()
-        {
-            //UI.ShowSubtitle("Just Closed");
-        }
-
-        void OnKeyDown(object sender, KeyEventArgs e)
-        {
-        }
-
-        void OnKeyUp(object sender, KeyEventArgs e)
-        {
-        }
-    }
-
-    class NativeWheel
-    {
-        public string Name;
-        public List<string> stationList = new List<string>();
-
-        public NativeWheel(string name)
-        {
-            Name = name;
-        }
-        
-        public static List<NativeWheel> WheelList = new List<NativeWheel>();
     }
 }

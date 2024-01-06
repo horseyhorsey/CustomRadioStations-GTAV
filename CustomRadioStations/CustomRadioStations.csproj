@@ -58,6 +58,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="Enum\ActionOptions.cs" />
     <Compile Include="Constants.cs" />
     <Compile Include="Helpers\ControlHelper.cs" />
     <Compile Include="Helpers\DecoratorHelper.cs" />
@@ -65,6 +66,7 @@
     <Compile Include="Helpers\GeneralEvents.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="MainScript.cs" />
+    <Compile Include="Radio\NativeWheel.cs" />
     <Compile Include="NativeWheelOrganizerScript.cs" />
     <Compile Include="Helpers\PathHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
