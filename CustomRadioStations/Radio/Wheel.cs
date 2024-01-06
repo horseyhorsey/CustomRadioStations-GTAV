@@ -18,7 +18,7 @@ namespace SelectorWheel
     public delegate void WheelCloseEvent(Wheel sender, WheelCategory selectedCategory, WheelCategoryItem selectedItem);
     public delegate void WheelItemTrigger(Wheel sender, WheelCategory selectedCategory, WheelCategoryItem selectedItem);
 
-    public class Wheel
+    public partial class Wheel
     {
         public string WheelName { get; set; }
         private bool _visible;
@@ -100,9 +100,9 @@ namespace SelectorWheel
         /// </summary>
         public event WheelItemTrigger OnItemTrigger;
 
-        /// <summary>
-        /// Show/Hide the selection wheel.
-        /// </summary>
+        /// <summary>Show/Hide the selection wheel. <para/>
+        /// This applies the timecycle modifier the same as the SP game when selecting a radio. <para/>
+        /// Category, Item and wheelopen will be invoked when set to visible</summary>
         public bool Visible
         {
             get { return _visible; }
@@ -112,12 +112,15 @@ namespace SelectorWheel
 
                 if (_visible == false && value == true) //When the wheel is just opened.
                 {
-                    Function.Call(Hash.SET_TIMECYCLE_MODIFIER, TimecycleModifier);
-                    Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, timecycleCurrentStrength);
+                    //apply slow motion
+                    ApplySelectingRadioTimeCycle();
+
                     transitionIn = true;
                     transitionOut = false;
 
+                    //calculate wheel positions
                     CalculateCategoryPlacement();
+
                     UIHelper.UpdateAspectRatio();
 
                     CategoryChange(SelectedCategory, SelectedCategory.SelectedItem, true);
@@ -130,28 +133,26 @@ namespace SelectorWheel
                     transitionOut = true;
 
                     WheelClose(SelectedCategory, SelectedCategory.SelectedItem);
+
                     foreach (var cat in Categories)
                     {
-                        if (cat.CategoryTexture != null)
-                        {
-                            cat.CategoryTexture.StopDraw();
-                        }
-                        if (cat.BackgroundTexture != null)
-                        {
-                            cat.BackgroundTexture.StopDraw();
-                        }
-                        if (cat.HighlightTexture != null)
-                        {
-                            cat.HighlightTexture.StopDraw();
-                        }
-                        if (cat.SelectedItem.ItemTexture != null)
-                        {
-                            cat.SelectedItem.ItemTexture.StopDraw();
-                        }
+                        cat.CategoryTexture?.StopDraw();
+                        cat.BackgroundTexture?.StopDraw();
+                        cat.HighlightTexture?.StopDraw();
+                        cat.SelectedItem?.ItemTexture?.StopDraw();
                     }
                 }
 
                 _visible = value;
+            }
+        }
+
+        private static void ApplySelectingRadioTimeCycle()
+        {
+            if (Config.EnableWheelSlowmotion)
+            {
+                Function.Call(Hash.SET_TIMECYCLE_MODIFIER, TimecycleModifier);
+                Function.Call(Hash.SET_TIMECYCLE_MODIFIER_STRENGTH, timecycleCurrentStrength);
             }
         }
 
@@ -265,12 +266,9 @@ namespace SelectorWheel
 
         }
 
-        /// <summary>
-        /// Call this after you have already added some categories (max is 18 categories. Edit: Limit removed temporarily).
-        /// This function will check the amount of categories and situate them around the origin of the screen.
-        /// 
-        /// 
-        /// </summary>
+        /// <summary>Call this after you have already added some categories (max is 18 categories. Edit: Limit removed temporarily). <para/>
+        /// This function will check the amount of categories and situate them around the origin of the screen. <para/>
+        /// This should be used after creating and whenever the wheel becomes visible</summary>
         public void CalculateCategoryPlacement()
         {
             /* 0f is on the middle-right, and it moves clockwise.
@@ -304,16 +302,16 @@ namespace SelectorWheel
                 foreach (var cat in Categories)
                 {
                     bool hasTexture = false;
-                    if (File.Exists(Path.Combine(TexturePath, UIHelper.MakeValidFileName(cat.Name) + ".png")))
+                    if (File.Exists(Path.Combine(TexturePath, PathHelper.MakeValidFileName(cat.Name) + ".png")))
                     {
-                        cat.CategoryTexture = new Texture(Path.Combine(TexturePath,UIHelper.MakeValidFileName(cat.Name) + ".png"), Categories.IndexOf(cat));
+                        cat.CategoryTexture = new Texture(Path.Combine(TexturePath,PathHelper.MakeValidFileName(cat.Name) + ".png"), Categories.IndexOf(cat));
                         hasTexture = true;
                     }
                     foreach (var item in cat.ItemList)
                     {
-                        if (File.Exists(Path.Combine(TexturePath, UIHelper.MakeValidFileName(item.Name) + ".png")))
+                        if (File.Exists(Path.Combine(TexturePath, PathHelper.MakeValidFileName(item.Name) + ".png")))
                         {
-                            item.ItemTexture = new Texture(Path.Combine(TexturePath, UIHelper.MakeValidFileName(item.Name) + ".png"), Categories.IndexOf(cat) /*cat.ItemList.IndexOf(item)*/);
+                            item.ItemTexture = new Texture(Path.Combine(TexturePath, PathHelper.MakeValidFileName(item.Name) + ".png"), Categories.IndexOf(cat) /*cat.ItemList.IndexOf(item)*/);
                             hasTexture = true;
                         }
                     }
@@ -356,6 +354,9 @@ namespace SelectorWheel
             }
         }
 
+        /// <summary> Sets the position2D of the <see cref="Categories"/> and increments the start angle </summary>
+        /// <param name="startAngle"></param>
+        /// <param name="numCategories"></param>
         void CalculateFromStartAngle(float startAngle, int numCategories)
         {
             if (numCategories < 1) return;
@@ -524,12 +525,14 @@ namespace SelectorWheel
                     inputCoord = Categories[CurrentCatIndex].position2D;
                 }
             }
-        }
+        }        
 
         public Font FontCategory = Font.ChaletComprimeCologne;
         public Font FontSelectedItem = Font.ChaletComprimeCologne;
         public Font FontCategoryItemCount = Font.ChaletComprimeCologne;
         public Font FontDescription = Font.ChaletLondon;
+
+        /// <summary> Draws selected radio </summary>
         void ControlCategorySelection()
         {
             foreach (var cat in Categories)
@@ -769,15 +772,6 @@ namespace SelectorWheel
                     return currIndex + 1;
                 }
             }
-        }
-
-        enum WheelDirection
-        {
-            MovingUp,
-            MovingDown,
-            MovingLeft,
-            MovingRight,
-            NotMoving
         }
 
         private WheelDirection GetMouseDirection()
