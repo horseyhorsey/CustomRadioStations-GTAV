@@ -4,6 +4,8 @@ using GTA.Math;
 
 namespace SelectorWheel
 {
+    /// <summary> A Wheel Category to hold WheelCategoryItems, <para/>
+    /// Initiliazing looks for a .png image of the same category name</summary>
     public class WheelCategory
     {
         public string Name;
@@ -20,9 +22,7 @@ namespace SelectorWheel
         /// <param name="name">Name of the category. If a matching .png image is found, the image will be displayed instead of any item image.</param>
         public WheelCategory(string name) => Name = name;
 
-        /// <summary>
-        /// Instantiates a new category for use in a selection wheel.
-        /// </summary>
+        /// <summary>Instantiates a new category for use in a selection wheel.</summary>
         /// <param name="name">Name of the category. If a matching .png image is found, the image will be displayed instead of any item image.</param>
         /// <param name="description">Category description. Only shown if there is no selected item description.</param>
         public WheelCategory(string name, string description) : this(name) => Description = description;
@@ -55,6 +55,7 @@ namespace SelectorWheel
             get { return Items.ElementAt(CurrentItemIndex); }
         }
 
+        /// <summary> Sets the <see cref="CurrentItemIndex"/></summary>
         public void GoToNextItem()
         {
             if (CurrentItemIndex < Items.Count - 1)
@@ -67,6 +68,7 @@ namespace SelectorWheel
             }
         }
 
+        /// <summary> Sets the <see cref="CurrentItemIndex"/></summary>
         public void GoToPreviousItem()
         {
             if (CurrentItemIndex > 0)

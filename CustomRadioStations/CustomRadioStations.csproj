@@ -59,7 +59,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Enum\ActionOptions.cs" />
-    <Compile Include="Constants.cs" />
+    <Compile Include="Common\Constants.cs" />
     <Compile Include="Extensions\ListExtensions.cs" />
     <Compile Include="Helpers\ControlHelper.cs" />
     <Compile Include="Helpers\DecoratorHelper.cs" />
@@ -90,6 +90,7 @@
     <Compile Include="Helpers\UIHelper.cs" />
     <Compile Include="Radio\WheelCategory.cs" />
     <Compile Include="Radio\WheelCategoryItem.cs" />
+    <Compile Include="Enum\WheelDirection.cs" />
     <Compile Include="Radio\WheelVars.cs" />
   </ItemGroup>
   <ItemGroup>
