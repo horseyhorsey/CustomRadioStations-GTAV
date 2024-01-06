@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Drawing;
+﻿using System.Drawing;
 using System.Globalization;
 using System.Windows.Forms;
 using GTA;
@@ -12,9 +8,7 @@ using ScriptSettings = Settings.ScriptSettings;
 namespace CustomRadioStations
 {
     public static class Config
-    {
-        private const string iniPath = @"scripts\Custom Radio Stations\settings.ini";
-
+    {        
         private const string INI_SECTION_GENERAL = "GENERAL",
                                 INI_SECTION_GRAPHICS = "GRAPHICS",
                                 INI_SECTION_KEYBOARD_CONTROLS = "KEYBOARD_CONTROLS",
@@ -49,7 +43,7 @@ namespace CustomRadioStations
         {
             ForceDecimal();
 
-            ScriptSettings config = ScriptSettings.Load(iniPath);
+            ScriptSettings config = ScriptSettings.Load(Constants.INI_PATH);
 
             var comment = ";Type 'radio_reload' into the cheat textbox (press ` to access) to reload settings.ini, NativeWheels.cfg, and all station.ini files.";
             config.SetValue<float>(INI_SECTION_GENERAL, "DEFAULT VOLUME (0 to 1.0)", SoundFile.SoundEngine.SoundVolume, comment);
@@ -89,7 +83,7 @@ namespace CustomRadioStations
         {
             ForceDecimal();
 
-            ScriptSettings config = ScriptSettings.Load(iniPath);
+            ScriptSettings config = ScriptSettings.Load(Constants.INI_PATH);
 
             SoundFile.SoundEngine.SoundVolume = config.GetValue<float>(INI_SECTION_GENERAL, "DEFAULT VOLUME (0 to 1.0)", 0.3f);
             CustomWheelAsDefault = config.GetValue<bool>(INI_SECTION_GENERAL, "First Custom Wheel Is Default On Startup", true);
@@ -120,6 +114,9 @@ namespace CustomRadioStations
             SaveINI();
         }
 
+        /// <summary> </summary>
+        /// <param name="directory"></param>
+        /// <returns></returns>
         public static (int iconX, int iconY, float wheelRadius) LoadWheelINI(string directory)
         {
             ForceDecimal();

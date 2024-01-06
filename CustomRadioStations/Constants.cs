@@ -2,11 +2,13 @@
 {
     public class Constants
     {
-        /// <summary>Main path containing directories which contain stations</summary>
-        public const string MAIN_PATH = @"scripts\Custom Radio Stations\";
-        public const string ICON_BG_PATH = @"scripts\Custom Radio Stations\iconbg.png";
-        public const string ICON_HL_PATH = @"scripts\Custom Radio Stations\iconhl.png";
-        public const string NLOG_PATH = @"scripts\Custom Radio Stations\NativeStations.log";
-        public const string NLOG_CFG_PATH = @"scripts\Custom Radio Stations\NativeWheels.cfg";
+        /// <summary>constants for paths for config, logging</summary>
+        public const string
+            MAIN_PATH = @"scripts\Custom Radio Stations\",
+            ICON_BG_PATH = @"scripts\Custom Radio Stations\iconbg.png",
+            ICON_HL_PATH = @"scripts\Custom Radio Stations\iconhl.png",
+            NLOG_PATH = @"scripts\Custom Radio Stations\NativeStations.log",
+            NLOG_CFG_PATH = @"scripts\Custom Radio Stations\NativeWheels.cfg",
+            INI_PATH = @"scripts\Custom Radio Stations\settings.ini";
     }
 }
