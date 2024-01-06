@@ -7,17 +7,48 @@ using System;
 
 namespace CustomRadioStations
 {
-    /// <summary> Soundfile utilizing the IrrKlang library</summary>
-    class SoundFile
+    /// <summary> Soundfile utilizing the IrrKlang library. <para/>
+    /// The sound file contains a list of tracks which are generated from user .ini files in station directories</summary>
+    class SoundFile : ISoundFile
     {
-        public ISound Sound;
-        public ISoundSource Source;
-        public ISoundEffectControl SoundEffect;
-
+        public static ISoundEngine SoundEngine = new ISoundEngine();
         public string FileName;
         public string FilePath;
-
+        public bool HasTrackList;
+        public ISound Sound;
+        public ISoundEffectControl SoundEffect;
+        public ISoundSource Source;
+        private static Random random = new Random();
         private string _displayName;
+        //public float MaximumDistance = 20f;
+        //public float MinimumDistance = 1f;
+
+        /// <summary> Adds the klang sound source from a file path </summary>
+        /// <param name="filepath"></param>
+        public SoundFile(string filepath)
+        {
+            FilePath = filepath;
+            Source = SoundEngine.AddSoundSourceFromFile(filepath, StreamMode.AutoDetect, false);
+            if (Source == null)
+            {
+                Source = SoundEngine.GetSoundSource(filepath);
+            }
+            FileName = Path.GetFileNameWithoutExtension(filepath);
+            _displayName = DisplayNameFromFilename();
+            //Length = Source.PlayLength;
+            HasTrackList = TracklistExists(filepath);
+        }
+
+        /// <summary>loading from shortcut paths, call base constructor and overrides FilePath</summary>
+        /// <param name="filepath"></param>
+        /// <param name="shortcutPath"></param>
+        public SoundFile(string filepath, string shortcutPath) : this(filepath)
+        {
+            FilePath = shortcutPath;
+            //Length = Source.PlayLength;
+            HasTrackList = TracklistExists(shortcutPath);
+        }
+        
         public string DisplayName
         {
             get
@@ -35,60 +66,178 @@ namespace CustomRadioStations
             }
         }
 
-        /// <summary>
-        /// Returns sound length in milliseconds
-        /// </summary>
+        public bool IsPaused
+        {
+            get
+            {
+                if (Sound == null) return false;
+                return Sound.Paused;
+            }
+            set
+            {
+                if (Sound == null || Sound.Finished) return;
+                Sound.Paused = value;
+            }
+        }
+        
         public uint Length { get; private set; } = 0;
-        /// <summary>
-        /// If Length has been added to this sound's corresponding station
-        /// </summary>
+        
         public bool LengthAdded { get; set; }
 
-        public bool HasTrackList;
         public List<Track> Tracklist { get; private set; }
 
-        //public float MaximumDistance = 20f;
-        //public float MinimumDistance = 1f;
-
-        private static Random random = new Random();
-
-        public SoundFile(string filepath)
+        /// <summary> cleans up sound engine and any playing sounds </summary>
+        public static void DisposeSoundEngine()
         {
-            FilePath = filepath;
-            Source = SoundEngine.AddSoundSourceFromFile(filepath, StreamMode.AutoDetect, false);
-            if (Source == null)
-            {
-                Source = SoundEngine.GetSoundSource(filepath);
-            }
-            FileName = Path.GetFileNameWithoutExtension(filepath);
-            _displayName = DisplayNameFromFilename();
-            //Length = Source.PlayLength;
-            HasTrackList = TracklistExists(filepath);
+            SoundEngine.StopAllSounds();
+            SoundEngine.Dispose();
         }
 
-        public SoundFile(string filepath, string shortcutPath)
+        /// <summary> Updates the SoundEngine called every tick</summary>
+        public static void ManageSoundEngine()
         {
-            FilePath = shortcutPath;
-            Source = SoundEngine.AddSoundSourceFromFile(filepath, StreamMode.AutoDetect, false);
-            if (Source == null)
-            {
-                Source = SoundEngine.GetSoundSource(filepath);
-            }
-            FileName = Path.GetFileNameWithoutExtension(filepath);
-            _displayName = DisplayNameFromFilename();
-            //Length = Source.PlayLength;
-            HasTrackList = TracklistExists(shortcutPath);
+            //SoundEngine.SetListenerPosition(new Vector3D(0, 0, 0), new Vector3D(0, 0, 1), new Vector3D(0, 0, 0), new Vector3D(0, 1, 0));
+            SoundEngine.Update();
         }
 
-        private string DisplayNameFromFilename()
+        public static void StepVolume(float step, int decimals)
         {
-            string[] sections = FileName.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
-            string str = "";
-            foreach (var s in sections)
+            float temp = (float)Math.Round(SoundEngine.SoundVolume + step, decimals, MidpointRounding.ToEven);
+            SoundEngine.SoundVolume = temp.LimitToRange(0f, 1f);
+        }
+
+        public void Dispose()
+        {
+            Sound.Stop();
+            Sound.Dispose();
+            Source.Dispose();
+        }
+        
+        public Track GetCurrentTrack()
+        {
+            if (!HasTrackList) return null;
+
+            //Track trk = Tracklist.FirstOrDefault(t => t.StartTime <= PlayPosition());
+            Track trk = Tracklist.LastOrDefault(t => PlayPosition() >= t.StartTime);
+
+            if (trk == default(Track))
             {
-                str += s.Trim() + "\n";
+                return null;
             }
-            return str;
+            else
+            {
+                return trk;
+            }
+        }
+
+        public int GetCurrentTrackIndex()
+        {
+            if (!HasTrackList) return 0;
+
+            return Tracklist.IndexOf(GetCurrentTrack());
+        }
+
+        public Track GetNextTrack()
+        {
+            if (!HasTrackList) return null;
+
+            Track t = GetCurrentTrack();
+
+            if (Tracklist.Last() == t)
+            {
+                return Tracklist.First();
+            }
+            else
+            {
+                return Tracklist[Tracklist.IndexOf(t) + 1];
+            }
+        }
+
+        public uint GetRandomPlayPosition(float percentMinBound = 0.2f, float percentMaxBound = 0.7f)
+        {
+            if (Sound == null) return 0;
+            uint min = (uint)(percentMinBound * Sound.PlayLength);
+            uint max = (uint)(percentMaxBound * Sound.PlayLength);
+
+            // Get random uint within bounds
+            var buffer = new byte[sizeof(uint)];
+            new Random().NextBytes(buffer);
+            uint result = BitConverter.ToUInt32(buffer, 0);
+
+            result = (result % (max - min)) + min;
+            return result;
+        }
+        
+        public bool IsFinishedPlaying() => Sound.Finished;
+
+        public bool IsPlaying()
+        {
+            return Sound != null && !Sound.Finished;
+        }
+        
+        public uint PlayPosition() => Sound.PlayPosition;
+
+        public void PlaySound(/*Vector3 sourcePosition,*/bool resume, bool playLooped = false, bool playPaused = false, bool allowMultipleInstances = false, bool allowSoundEffects = false)
+        {
+            if (allowMultipleInstances || (!allowMultipleInstances && (Sound == null || Sound != null && (Sound.Finished || IsPaused))))
+            {
+                // Vector3D sourcePos = SoundHelperIK.Vector3ToVector3D(GameplayCamera.GetOffsetFromWorldCoords(sourcePosition));
+
+                if (resume && IsPaused)
+                {
+                    IsPaused = false;
+                    return;
+                }
+
+                // Sound = SoundEngine.Play3D(Source, sourcePos.X, sourcePos.Y, sourcePos.Z, playLooped, false, false);
+                Sound = SoundEngine.Play2D(Source, playLooped, true, allowSoundEffects);
+
+                if (Sound == null) return;
+
+                // Attempt to avoid popping..
+                Sound.Volume = 0f;
+
+                if (!playPaused)
+                {
+                    Sound.Paused = false;
+                }
+
+                Sound.Volume = Source.DefaultVolume;
+
+                if (Length == 0)
+                {
+                    //Length = Source.PlayLength;
+                    Length = Sound.PlayLength;
+                }
+                if (allowSoundEffects)
+                {
+                    SoundEffect = Sound.SoundEffectControl;
+                }
+            }
+        }
+
+        public void SkipToNextTrack()
+        {
+            if (!HasTrackList) return;
+
+            Sound.PlayPosition = GetNextTrack().StartTime;
+        }
+
+        public void StopSound()
+        {
+            if (Sound?.Finished ?? false) return;
+            Sound?.Stop();
+        }
+
+        public uint TimeUntilNextTrack()
+        {
+            if (Sound == null || PlayPosition() == -1) return 0;
+            if (!HasTrackList) return Length - PlayPosition();
+
+            Track t = GetNextTrack();
+            uint pPos = PlayPosition();
+
+            return t.StartTime > pPos ? t.StartTime - pPos + 1 : Length - pPos;
         }
 
         internal bool TracklistExists(string filepath)
@@ -135,7 +284,7 @@ namespace CustomRadioStations
 
                 // Get remainder of string
                 string artistTitle = inputFromINI.Substring(8);
-                
+
                 if (artistTitle.Contains("||"))
                 {
                     // Separate it by the string ||
@@ -154,154 +303,16 @@ namespace CustomRadioStations
             }
         }
 
-        public Track GetCurrentTrack()
+        private string DisplayNameFromFilename()
         {
-            if (!HasTrackList) return null;
-
-            //Track trk = Tracklist.FirstOrDefault(t => t.StartTime <= PlayPosition());
-            Track trk = Tracklist.LastOrDefault(t => PlayPosition() >= t.StartTime);
-
-            if (trk == default(Track))
+            string[] sections = FileName.Split(new string[] { " - " }, StringSplitOptions.RemoveEmptyEntries);
+            string str = "";
+            foreach (var s in sections)
             {
-                return null;
+                str += s.Trim() + "\n";
             }
-            else
-            {
-                return trk;
-            }
+            return str;
         }
-
-        public int GetCurrentTrackIndex()
-        {
-            if (!HasTrackList) return 0;
-
-            return Tracklist.IndexOf(GetCurrentTrack());
-        }
-
-        public Track GetNextTrack()
-        {
-            if (!HasTrackList) return null;
-
-            Track t = GetCurrentTrack();
-
-            if (Tracklist.Last() == t)
-            {
-                return Tracklist.First();
-            }
-            else
-            {
-                return Tracklist[Tracklist.IndexOf(t) + 1];
-            }
-        }
-
-        public void SkipToNextTrack()
-        {
-            if (!HasTrackList) return;
-
-            Sound.PlayPosition = GetNextTrack().StartTime;
-        }
-
-        public uint TimeUntilNextTrack()
-        {
-            if (Sound == null || PlayPosition() == -1) return 0;
-            if (!HasTrackList) return Length - PlayPosition();
-
-            Track t = GetNextTrack();
-            uint pPos = PlayPosition();
-
-            return t.StartTime > pPos ? t.StartTime - pPos + 1 : Length - pPos;
-        }
-
-        public uint GetRandomPlayPosition(float percentMinBound = 0.2f, float percentMaxBound = 0.7f)
-        {
-            if (Sound == null) return 0;
-            uint min = (uint)(percentMinBound * Sound.PlayLength);
-            uint max = (uint)(percentMaxBound * Sound.PlayLength);
-
-            // Get random uint within bounds
-            var buffer = new byte[sizeof(uint)];
-            new Random().NextBytes(buffer);
-            uint result = BitConverter.ToUInt32(buffer, 0);
-
-            result = (result % (max - min)) + min;
-            return result;
-        }
-
-        public void PlaySound(/*Vector3 sourcePosition,*/bool resume, bool playLooped = false, bool playPaused = false, bool allowMultipleInstances = false, bool allowSoundEffects = false)
-        {
-            if (allowMultipleInstances || (!allowMultipleInstances && (Sound == null || Sound != null && (Sound.Finished || IsPaused))))
-            {
-                // Vector3D sourcePos = SoundHelperIK.Vector3ToVector3D(GameplayCamera.GetOffsetFromWorldCoords(sourcePosition));
-                
-                if (resume && IsPaused)
-                {
-                    IsPaused = false;
-                    return;
-                }
-
-                // Sound = SoundEngine.Play3D(Source, sourcePos.X, sourcePos.Y, sourcePos.Z, playLooped, false, false);
-                Sound = SoundEngine.Play2D(Source, playLooped, true, allowSoundEffects);
-
-                if (Sound == null) return;
-
-                // Attempt to avoid popping..
-                Sound.Volume = 0f;
-
-                if (!playPaused)
-                {
-                    Sound.Paused = false;
-                }
-
-                Sound.Volume = Source.DefaultVolume;
-
-                if (Length == 0)
-                {
-                    //Length = Source.PlayLength;
-                    Length = Sound.PlayLength;
-                }
-                if (allowSoundEffects)
-                {
-                    SoundEffect = Sound.SoundEffectControl;
-                }
-            }
-        }
-
-        public void StopSound()
-        {
-            if (Sound == null || Sound.Finished) return;
-            Sound.Stop();
-        }
-
-        public bool IsPaused
-        {
-            get
-            {
-                if (Sound == null) return false;
-                return Sound.Paused;
-            }
-            set
-            {
-                if (Sound == null || Sound.Finished) return;
-                Sound.Paused = value;
-            }
-        }
-
-        public bool IsPlaying()
-        {
-            return Sound != null && !Sound.Finished;
-        }
-
-        public bool IsFinishedPlaying()
-        {
-            return Sound.Finished;
-        }
-
-        /// <summary>
-        /// Returns -1 if null, not playing, etc. 
-        /// Else returns position in milliseconds.
-        /// </summary>
-        /// <returns></returns>
-        public uint PlayPosition() => Sound.PlayPosition;
 
         // 3D Sound stuff only
         /*public void ProcessSound(Vector3 sourcePosition)
@@ -320,32 +331,5 @@ namespace CustomRadioStations
             MaximumDistance = max;
             MinimumDistance = min;
         }*/
-
-        public void Dispose()
-        {
-            Sound.Stop();
-            Sound.Dispose();
-            Source.Dispose();
-        }
-
-        public static ISoundEngine SoundEngine = new ISoundEngine();
-
-        public static void ManageSoundEngine()
-        {
-            //SoundEngine.SetListenerPosition(new Vector3D(0, 0, 0), new Vector3D(0, 0, 1), new Vector3D(0, 0, 0), new Vector3D(0, 1, 0));
-            SoundEngine.Update();
-        }
-
-        public static void StepVolume(float step, int decimals)
-        {
-            float temp = (float)Math.Round(SoundEngine.SoundVolume + step, decimals, MidpointRounding.ToEven);
-            SoundEngine.SoundVolume = temp.LimitToRange(0f, 1f);
-        }
-
-        public static void DisposeSoundEngine()
-        {
-            SoundEngine.StopAllSounds();
-            SoundEngine.Dispose();
-        }
     }
 }

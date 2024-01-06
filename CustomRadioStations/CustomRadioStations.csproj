@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Enum\ActionOptions.cs" />
     <Compile Include="Constants.cs" />
+    <Compile Include="Extensions\ListExtensions.cs" />
     <Compile Include="Helpers\ControlHelper.cs" />
     <Compile Include="Helpers\DecoratorHelper.cs" />
     <Compile Include="Helpers\Decorators.cs" />
@@ -67,6 +68,7 @@
     <Compile Include="Common\Logger.cs" />
     <Compile Include="MainScript.cs" />
     <Compile Include="Enum\GoTo.cs" />
+    <Compile Include="Radio\ISoundFile.cs" />
     <Compile Include="Radio\NativeWheel.cs" />
     <Compile Include="NativeWheelOrganizerScript.cs" />
     <Compile Include="Helpers\PathHelper.cs" />

@@ -4,6 +4,7 @@ using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
+using CustomRadioStations.Extensions;
 
 namespace CustomRadioStations
 {
@@ -21,10 +22,7 @@ namespace CustomRadioStations
         public NativeWheelOrganizerScript()
         {
             Tick += OnTick;
-            KeyDown += OnKeyDown;
-            KeyUp += OnKeyUp;
             Aborted += OnAbort;
-
             Interval = 10;
         }
 
@@ -50,6 +48,8 @@ namespace CustomRadioStations
             Game.DisableControlThisFrame(GTA.Control.VehiclePrevRadio);
         }
 
+        /// <summary> Reads the config (.cfg) from the <see cref="Constants.NLOG_CFG_PATH"/> to create Native Radio wheels. <para/>
+        /// configuration will include [Full] or [Favs], (untested creating more - horse)</summary>
         void GetOrganizationLists()
         {
             if (!File.Exists(Constants.NLOG_CFG_PATH)) return;
@@ -60,7 +60,7 @@ namespace CustomRadioStations
 
             foreach (string line in lines)
             {
-                if (String.IsNullOrWhiteSpace(line)) continue;
+                if (string.IsNullOrWhiteSpace(line)) continue;
 
                 string l = line.Trim();
 
@@ -85,14 +85,7 @@ namespace CustomRadioStations
             }
 
             if (WheelListIsPopulated())
-            {
                 currentWheel = NativeWheel.WheelList[0];
-
-                //foreach (var w in NativeWheel.WheelList)
-                //{
-                //    w.stationList.ForEach(x => Logger.Log(x, logPath));
-                //}
-            }
         }
 
         void LogAllStations()
@@ -135,14 +128,6 @@ namespace CustomRadioStations
         {
             //UI.ShowSubtitle("Just Opened");
             UpdateWheelThisFrame();
-        }
-
-        void OnKeyDown(object sender, KeyEventArgs e)
-        {
-        }
-
-        void OnKeyUp(object sender, KeyEventArgs e)
-        {
         }
 
         void OnTick(object sender, EventArgs e)
