@@ -76,7 +76,7 @@ namespace EventHelper
         {
             if (PlayerVehicle == null) return;
 
-            if (PlayerVehicle.EngineRunning)
+            if (PlayerVehicle.IsEngineRunning)
             {
                 if (!engineTurnedOnToggle)
                 {

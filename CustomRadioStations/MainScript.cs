@@ -5,11 +5,10 @@ using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using System.Drawing;
 using GTA.Math;
 using SelectorWheel;
-using GTAVFunctions;
 using EventHelper;
+using System.Diagnostics;
 
 namespace CustomRadioStations
 {
@@ -194,7 +193,7 @@ namespace CustomRadioStations
             }
             else
             {
-                UI.ShowSubtitle("No music found in Custom Radio Stations. " +
+                GTA.UI.Screen.ShowSubtitle("No music found in Custom Radio Stations. " +
                     "Please add music and reload script with the INS key.");
                 Logger.Log("ERROR: No music found in any station directory. Aborting script...");
                 Tick -= OnTick;
@@ -205,14 +204,14 @@ namespace CustomRadioStations
         {
             GeneralEvents.OnPlayerEnteredVehicle += (veh) =>
             {
-                bool vehWasEngineRunning = veh.EngineRunning;
+                bool vehWasEngineRunning = veh.IsEngineRunning;
 
                 // Make vanilla radio silent
                 RadioNativeFunctions.VanillaRadioFadedOut(true);
 
                 DateTime enteredTime = DateTime.Now;
 
-                while (!veh.EngineRunning || DateTime.Now > enteredTime.AddSeconds(10))
+                while (!veh.IsEngineRunning || DateTime.Now > enteredTime.AddSeconds(10))
                 {
                     //UI.ShowSubtitle((enteredTime.AddSeconds(10) - DateTime.Now).TotalMilliseconds.ToString());
                     vehWasEngineRunning = false;
@@ -221,7 +220,7 @@ namespace CustomRadioStations
 
                 // In case the timeout above caused the loop to break,
                 // We will not continue because the vehicle is dead.
-                if (!veh.EngineRunning) return;
+                if (!veh.IsEngineRunning) return;
 
                 if (UsedVehiclesManager.IsUsedVehicle(veh))
                 {
@@ -345,7 +344,7 @@ namespace CustomRadioStations
                 if (loadDelayTimer < DateTime.Now || Decorators.ScriptHasLoadedOnce)
                 {
                     if (Config.DisplayHelpText)
-                        UI.ShowSubtitle("Loading Custom Radios...");
+                        GTA.UI.Screen.ShowSubtitle("Loading Custom Radios...");
 
                     SetupRadio();
                     SetupEvents();
@@ -360,7 +359,7 @@ namespace CustomRadioStations
                     loaded = true;
 
                     if (Config.DisplayHelpText)
-                        UI.ShowSubtitle("Custom Radios Loaded");
+                        GTA.UI.Screen.ShowSubtitle("Custom Radios Loaded");
 
                     if (Config.CustomWheelAsDefault && WheelVars.RadioWheels.Count > 0)
                     {
@@ -374,19 +373,19 @@ namespace CustomRadioStations
 
             if (WheelVars.RadioWheels.Count == 0) return;
 
-            if (GTAFunction.HasCheatStringJustBeenEntered("radio_reload"))
+            if (GTA.Game.WasCheatStringJustEntered("radio_reload"))
             {
                 Config.LoadINI();
                 Config.UpdateWheelsVisuals();
                 Config.ReloadStationINIs();
                 Config.RescanForTracklists();
-                UI.ShowSubtitle("Custom Radio INIs reloaded:\n- settings.ini\n- station.ini files\n- Scanned for tracklists");
+                GTA.UI.Screen.ShowSubtitle("Custom Radio INIs reloaded:\n- settings.ini\n- station.ini files\n- Scanned for tracklists");
                 Wait(150);
             }
 
             if (VanillaOrCustomRadioWheelIsVisible())
             {
-                if (GTAFunction.UsingGamepad() && Game.IsControlJustPressed(2, Config.GP_Toggle))
+                if (ControlHelper.UsingGamepad() && Game.IsControlJustPressed(Config.GP_Toggle))
                 {
                     HandleRadioWheelToggle();
                 }
@@ -399,7 +398,7 @@ namespace CustomRadioStations
                 lastPlayedOnFoot = Game.Player.Character.IsInVehicle() ? false : true;
             }
 
-            if (Game.IsControlJustReleased(2, GTA.Control.VehicleRadioWheel))
+            if (Game.IsControlJustReleased(GTA.Control.VehicleRadioWheel))
             {
                 if (WheelVars.CurrentRadioWheel.Visible)
                 {
@@ -448,35 +447,35 @@ namespace CustomRadioStations
             {
                 if (RadioStation.CurrentPlaying != null)
                 {
-                    ControlSkipTrack = GTAFunction.UsingGamepad() ? Config.GP_Skip_Track : Config.KB_Skip_Track;
-                    ControlVolumeUp = GTAFunction.UsingGamepad() ? Config.GP_Volume_Up : Config.KB_Volume_Up;
-                    ControlVolumeDown = GTAFunction.UsingGamepad() ? Config.GP_Volume_Down : Config.KB_Volume_Down;
-                    ControlNextWheel = GTAFunction.UsingGamepad() ? GTA.Control.VehicleAccelerate : GTA.Control.WeaponWheelPrev;
-                    ControlPrevWheel = GTAFunction.UsingGamepad() ? GTA.Control.VehicleBrake : GTA.Control.WeaponWheelNext;
+                    ControlSkipTrack = ControlHelper.UsingGamepad() ? Config.GP_Skip_Track : Config.KB_Skip_Track;
+                    ControlVolumeUp = ControlHelper.UsingGamepad() ? Config.GP_Volume_Up : Config.KB_Volume_Up;
+                    ControlVolumeDown = ControlHelper.UsingGamepad() ? Config.GP_Volume_Down : Config.KB_Volume_Down;
+                    ControlNextWheel = ControlHelper.UsingGamepad() ? GTA.Control.VehicleAccelerate : GTA.Control.WeaponWheelPrev;
+                    ControlPrevWheel = ControlHelper.UsingGamepad() ? GTA.Control.VehicleBrake : GTA.Control.WeaponWheelNext;
                     
                     if (Config.DisplayHelpText)
                     {
-                        GTAFunction.DisplayHelpTextThisFrame(
-                            GTAFunction.InputString(ControlSkipTrack) +
+                        GTA.UI.Screen.ShowHelpTextThisFrame(
+                            ControlHelper.InputString(ControlSkipTrack) +
                             " : Skip Track\n" +
-                            GTAFunction.InputString(ControlVolumeUp) + " " +
-                            GTAFunction.InputString(ControlVolumeDown) +
+                            ControlHelper.InputString(ControlVolumeUp) + " " +
+                            ControlHelper.InputString(ControlVolumeDown) +
                             " : Volume: " +
                             Math.Round(SoundFile.SoundEngine.SoundVolume * 100, 0) + "%\n" +
-                            GTAFunction.InputString(ControlNextWheel) + " " +
-                            GTAFunction.InputString(ControlPrevWheel) +
-                            " : Next / Prev Wheel\n", false, false);
+                            ControlHelper.InputString(ControlNextWheel) + " " +
+                            ControlHelper.InputString(ControlPrevWheel) +
+                            " : Next / Prev Wheel\n", false);
                     }
                     
-                    if (Game.IsControlJustPressed(2, ControlSkipTrack))
+                    if (Game.IsControlJustPressed(ControlSkipTrack))
                     {
                         RadioStation.CurrentPlaying.PlayNextSong();
                     }
-                    else if (Game.IsControlJustPressed(2, ControlVolumeUp))
+                    else if (Game.IsControlJustPressed(ControlVolumeUp))
                     {
                         SoundFile.StepVolume(0.05f, 2);
                     }
-                    else if (Game.IsControlJustPressed(2, ControlVolumeDown))
+                    else if (Game.IsControlJustPressed(ControlVolumeDown))
                     {
                         SoundFile.StepVolume(-0.05f, 2);
                     }
@@ -484,10 +483,10 @@ namespace CustomRadioStations
             }
             if (RadioStation.CurrentPlaying != null)
             {
-                Game.DisableControlThisFrame(2, GTA.Control.VehicleNextRadio);
-                Game.DisableControlThisFrame(2, GTA.Control.VehicleNextRadioTrack);
-                Game.DisableControlThisFrame(2, GTA.Control.VehiclePrevRadio);
-                Game.DisableControlThisFrame(2, GTA.Control.VehiclePrevRadioTrack);
+                Game.DisableControlThisFrame(GTA.Control.VehicleNextRadio);
+                Game.DisableControlThisFrame(GTA.Control.VehicleNextRadioTrack);
+                Game.DisableControlThisFrame(GTA.Control.VehiclePrevRadio);
+                Game.DisableControlThisFrame(GTA.Control.VehiclePrevRadioTrack);
 
                 RadioNativeFunctions.SetVanillaRadioOff();
             }
@@ -530,11 +529,11 @@ namespace CustomRadioStations
                 canResumeCustomStation = false;
             }*/
         }
-
+        
         bool doUnpauseNextFrame;
         public void HandleGamePause()
         {
-            if (Game.IsControlJustPressed(2, GTAFunction.UsingGamepad() ? GTA.Control.FrontendPause : GTA.Control.FrontendPauseAlternate))
+            if (Game.IsControlJustPressed(ControlHelper.UsingGamepad() ? GTA.Control.FrontendPause : GTA.Control.FrontendPauseAlternate))
             {
                 if (RadioStation.CurrentPlaying != null)
                 {
@@ -621,23 +620,30 @@ namespace CustomRadioStations
 
         void HandleRadioWheelToggle()
         {
-            if (WheelVars.CurrentRadioWheel.Visible)
+            try
             {
-                ActionQueued = ActionOptions.StopCurrent;
+                if (WheelVars.CurrentRadioWheel.Visible)
+                {
+                    ActionQueued = ActionOptions.StopCurrent;
 
-                RadioStation.NextQueuedStation = null;
+                    RadioStation.NextQueuedStation = null;
 
-                SetActionDelay(Config.WheelActionDelay);
+                    SetActionDelay(Config.WheelActionDelay);
 
-                // Switch to vanilla radio
-                WheelVars.CurrentRadioWheel.Visible = false;
-                lastRadioWasCustom = false;
+                    // Switch to vanilla radio
+                    WheelVars.CurrentRadioWheel.Visible = false;
+                    lastRadioWasCustom = false;
+                }
+                else
+                {
+                    // Switch to custom radio
+                    WheelVars.CurrentRadioWheel.Visible = true;
+                    lastRadioWasCustom = true;
+                }
             }
-            else
+            catch (Exception ex)
             {
-                // Switch to custom radio
-                WheelVars.CurrentRadioWheel.Visible = true;
-                lastRadioWasCustom = true;
+                Debug.WriteLine(ex.ToString());
             }
         }
 
@@ -652,7 +658,7 @@ namespace CustomRadioStations
         bool VanillaOrCustomRadioWheelIsVisible()
         {
             //return /*_IS_PLAYER_VEHICLE_RADIO_ENABLED() &&*/ Game.IsControlPressed(2, GTA.Control.VehicleRadioWheel) && Game.Player.CanControlCharacter;
-            if (Game.IsControlPressed(2, GTA.Control.VehicleRadioWheel) && Game.Player.CanControlCharacter)
+            if (Game.IsControlPressed(GTA.Control.VehicleRadioWheel) && Game.Player.CanControlCharacter)
             {
                 if (Game.Player.Character.IsInVehicle() && RadioNativeFunctions._IS_PLAYER_VEHICLE_RADIO_ENABLED())
                 {
@@ -689,7 +695,7 @@ namespace CustomRadioStations
             {
                 if (!loaded)
                 {
-                    UI.ShowSubtitle("Custom Radio not loaded yet, please try again later!");
+                    GTA.UI.Screen.ShowSubtitle("Custom Radio not loaded yet, please try again later!");
                     return;
                 }
 

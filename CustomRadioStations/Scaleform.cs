@@ -48,7 +48,7 @@ namespace ScaleformHelper
         public void CallFunction (string function, params object[] arguments)
         {
             // Start calling the function.
-            Function.Call(Hash._PUSH_SCALEFORM_MOVIE_FUNCTION, this.Handle, function);
+            Function.Call(Hash.BEGIN_SCALEFORM_MOVIE_METHOD, this.Handle, function);
 
             // Loop through all arguments.
             foreach (object argument in arguments)
@@ -59,19 +59,19 @@ namespace ScaleformHelper
                 if (argument.GetType() == typeof(int))
                 {
                     // Call native GRAPHICS::_PUSH_SCALEFORM_MOVIE_METHOD_PARAMETER_INT
-                    Function.Call(Hash._PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_INT, (int)argument);
+                    Function.Call(Hash.SCALEFORM_MOVIE_METHOD_ADD_PARAM_INT, (int)argument);
                 }
 
                 else if (argument.GetType() == typeof(string))
                 {
                     // Call native GRAPHICS::_PUSH_SCALEFORM_MOVIE_METHOD_PARAMETER_STRING
-                    Function.Call(Hash._PUSH_SCALEFORM_MOVIE_FUNCTION_PARAMETER_STRING, (string)argument);
+                    Function.Call(Hash.SCALEFORM_MOVIE_METHOD_ADD_PARAM_TEXTURE_NAME_STRING, (string)argument);
                 }
 
             }
 
             // Pop the function over to the game.
-            Function.Call(Hash._POP_SCALEFORM_MOVIE_FUNCTION_VOID);
+            Function.Call(Hash.END_SCALEFORM_MOVIE_METHOD);
         }
 
         public void CallFunctionArray (string function, params string[] arguments)
@@ -87,11 +87,11 @@ namespace ScaleformHelper
             }
 
             // Call native GRAPHICS::_CALL_SCALEFORM_MOVIE_FUNCTION_STRING_PARAMS
-            Function.Call(Hash._CALL_SCALEFORM_MOVIE_FUNCTION_STRING_PARAMS, this.Handle, function,
+            Function.Call(Hash.CALL_SCALEFORM_MOVIE_METHOD_WITH_STRING, this.Handle, function,
                 argArray[0], argArray[1], argArray[2], argArray[3], argArray[4]);
 
             // Pop the function over to the game.
-            Function.Call(Hash._POP_SCALEFORM_MOVIE_FUNCTION_VOID);
+            Function.Call(Hash.END_SCALEFORM_MOVIE_METHOD);
         }
     }
 }

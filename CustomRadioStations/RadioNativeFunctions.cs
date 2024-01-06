@@ -1,10 +1,6 @@
 ﻿using GTA;
 using GTA.Native;
 using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace CustomRadioStations
 {
@@ -24,7 +20,7 @@ namespace CustomRadioStations
             }
             catch (Exception exception)
             {
-                UI.Notify(exception.ToString());
+                GTA.UI.Notification.Show(exception.ToString());
             }
         }
 
@@ -95,7 +91,7 @@ namespace CustomRadioStations
         /// <param name="hide">true = hide or remove from wheel</param>
         public static void _LOCK_RADIO_STATION(string stationName, bool hide)
         {
-            if ((int)Game.Version >= (int)GameVersion.VER_1_0_1493_0_STEAM)
+            if ((int)Game.Version >= (int)GameVersion.v1_0_1493_1_Steam)
                 Function.Call((Hash)0x477D9DB48F889591, stationName, hide); // _LOCK_RADIO_STATION
         }
 
@@ -111,7 +107,7 @@ namespace CustomRadioStations
 
         public static void SetVanillaRadioOff()
         {
-            if (Game.Player.Character.IsInVehicle() && Game.Player.Character.CurrentVehicle.EngineRunning)
+            if (Game.Player.Character.IsInVehicle() && Game.Player.Character.CurrentVehicle.IsEngineRunning)
             {
                 SetVehicleRadioStationOff();
             }

@@ -1,11 +1,9 @@
 ﻿using GTA;
-using GTA.Native;
 using System;
 using System.Windows.Forms;
 using System.IO;
 using System.Collections.Generic;
 using System.Linq;
-using GTAVFunctions;
 
 namespace CustomRadioStations
 {
@@ -52,7 +50,7 @@ namespace CustomRadioStations
             Logger.Init(logPath);
 
             Logger.Log("Game version: " + Game.Version.ToString(), logPath);
-            if ((int)Game.Version < (int)GameVersion.VER_1_0_1493_0_STEAM)
+            if ((int)Game.Version < (int)GameVersion.v1_0_1493_1_Steam)
                 Logger.Log("WARNING: Can't use the native radio wheel organizer on this game version. " +
                     "Please update to 1.0.1493.0 or higher.");
 
@@ -125,7 +123,7 @@ namespace CustomRadioStations
 
         void OnTick(object sender, EventArgs e)
         {
-            if (GTAFunction.HasCheatStringJustBeenEntered("radio_reload"))
+            if (GTA.Game.WasCheatStringJustEntered("radio_reload"))
             {
                 UnhideAllStations();
                 NativeWheel.WheelList = null;
@@ -173,45 +171,43 @@ namespace CustomRadioStations
         GTA.Control ControlPrevWheel;
         void ShowHelpTexts()
         {
-            ControlNextWheel = GTAFunction.UsingGamepad() ? GTA.Control.VehicleAccelerate : GTA.Control.WeaponWheelPrev;
-            ControlPrevWheel = GTAFunction.UsingGamepad() ? GTA.Control.VehicleBrake : GTA.Control.WeaponWheelNext;
+            ControlNextWheel = ControlHelper.UsingGamepad() ? GTA.Control.VehicleAccelerate : GTA.Control.WeaponWheelPrev;
+            ControlPrevWheel = ControlHelper.UsingGamepad() ? GTA.Control.VehicleBrake : GTA.Control.WeaponWheelNext;
 
             if (!Config.DisplayHelpText) return;
 
-            string nativeWheelText = (int)Game.Version < (int)GameVersion.VER_1_0_1493_0_STEAM ?
+            string nativeWheelText = (int)Game.Version < (int)GameVersion.v1_0_1493_1_Steam ?
                 "" :
                 (WheelListIsPopulated() ?
                 "\n" +
-                GTAFunction.InputString(ControlNextWheel) + " " +
-                GTAFunction.InputString(ControlPrevWheel) +
+                ControlHelper.InputString(ControlNextWheel) + " " +
+                ControlHelper.InputString(ControlPrevWheel) +
                 " : Next / Prev Wheel\n" +
                 "Wheel: " + currentWheel.Name
                 : "");
 
-            GTAFunction.DisplayHelpTextThisFrame(
-                GTAFunction.InputString(Config.KB_Toggle, Config.GP_Toggle) +
-                " : Switch to Custom Wheels" +
-                nativeWheelText
-                , false, false
-                );
+            GTA.UI.Screen.ShowHelpTextThisFrame(
+                ControlHelper.InputString(Config.KB_Toggle, Config.GP_Toggle) +
+                " : Switch to Custom Wheels" + nativeWheelText,
+                false);
         }
 
         void DisableNativeScrollRadioControls()
         {
-            Game.DisableControlThisFrame(2, GTA.Control.VehicleNextRadio);
-            Game.DisableControlThisFrame(2, GTA.Control.VehiclePrevRadio);
+            Game.DisableControlThisFrame(GTA.Control.VehicleNextRadio);
+            Game.DisableControlThisFrame(GTA.Control.VehiclePrevRadio);
         }
 
         void ControlWheelChange()
         {
             if (!WheelListIsPopulated()) return;
 
-            if (Game.IsControlJustPressed(2, ControlNextWheel))
+            if (Game.IsControlJustPressed(ControlNextWheel))
             {
                 currentWheel = NativeWheel.WheelList.GetNext(currentWheel);
                 UpdateWheelThisFrame();
             }
-            else if (Game.IsControlJustPressed(2, ControlPrevWheel))
+            else if (Game.IsControlJustPressed(ControlPrevWheel))
             {
                 currentWheel = NativeWheel.WheelList.GetPrevious(currentWheel);
                 UpdateWheelThisFrame();

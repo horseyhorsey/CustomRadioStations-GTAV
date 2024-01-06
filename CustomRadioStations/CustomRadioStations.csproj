@@ -33,6 +33,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <LangVersion>7.1</LangVersion>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
   <PropertyGroup />
   <PropertyGroup>
@@ -42,8 +43,8 @@
     <Reference Include="irrKlang.NET4">
       <HintPath>..\packages\irrKlang-64bit-1.6.0\bin\dotnet-4-64\irrKlang.NET4.dll</HintPath>
     </Reference>
-    <Reference Include="ScriptHookVDotNet2, Version=2.10.12.0, Culture=neutral, processorArchitecture=AMD64">
-      <HintPath>..\packages\ScriptHookVDotNet2.2.10.12\lib\net48\ScriptHookVDotNet2.dll</HintPath>
+    <Reference Include="ScriptHookVDotNet3, Version=3.6.0.0, Culture=neutral, processorArchitecture=AMD64">
+      <HintPath>..\packages\ScriptHookVDotNet3.3.6.0\lib\net48\ScriptHookVDotNet3.dll</HintPath>
     </Reference>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -57,13 +58,12 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="ControlHelper.cs" />
     <Compile Include="DecoratorHelper.cs" />
     <Compile Include="Decorators.cs" />
     <Compile Include="GeneralEvents.cs" />
-    <Compile Include="GTAVFunctions.cs" />
     <Compile Include="Logger.cs" />
     <Compile Include="MainScript.cs" />
-    <Compile Include="MathUtil.cs" />
     <Compile Include="NativeWheelOrganizerScript.cs" />
     <Compile Include="PathHelper.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -105,8 +105,6 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>COPY "$(TargetDir)$(TargetFileName)" "C:\Program Files\Rockstar Games\Grand Theft Auto V\scripts"
-xcopy /y "$(TargetDir)$(TargetName).pdb" "C:\Program Files\Rockstar Games\Grand Theft Auto V\scripts"</PostBuildEvent>
   </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.

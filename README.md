@@ -7,6 +7,6 @@ If you are looking for help on how to install and use this mod, please see [this
 
 ## Building / Contributing
 
-* You will need to install ScriptHookVDotNet 2.10.12.0 via the NuGet package manager; it is already referenced in the project.
+* You will need to install ScriptHookVDotNet 3.6.0 via the NuGet package manager; it is already referenced in the project.
 * You will need to download a version of irrKlang (ex: irrKlang-64bit-1.6.0) from [here](https://www.ambiera.com/irrklang/downloads.html) and copy the folder to match the relative path `\packages\irrKlang-64bit-1.6.0\bin\dotnet-4-64\irrKlang.NET4.dll`
 * Assets are not included in this repo. You can grab them from the latest official download [here](https://www.gta5-mods.com/scripts/custom-radio-stations-net#description_tab).

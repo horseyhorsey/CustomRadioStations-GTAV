@@ -48,7 +48,7 @@ public static class DecoratorHelper
     {
         if (entity == null || !entity.Exists()) return -8008f;
 
-        return Function.Call<float>(Hash._DECOR_GET_FLOAT, entity, propertyName);
+        return Function.Call<float>(Hash.DECOR_GET_FLOAT, entity, propertyName);
     }
 
     public static int DECOR_GET_INT(Entity entity, string propertyName)
@@ -69,7 +69,7 @@ public static class DecoratorHelper
     {
         if (entity == null || !entity.Exists()) return false;
 
-        return Function.Call<bool>(Hash._DECOR_SET_FLOAT, entity, propertyName, value);
+        return Function.Call<bool>(Hash.DECOR_SET_FLOAT, entity, propertyName, value);
     }
 
     public static bool DECOR_SET_INT(Entity entity, string propertyName, int value)
