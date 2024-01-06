@@ -66,6 +66,7 @@
     <Compile Include="Helpers\GeneralEvents.cs" />
     <Compile Include="Common\Logger.cs" />
     <Compile Include="MainScript.cs" />
+    <Compile Include="Enum\GoTo.cs" />
     <Compile Include="Radio\NativeWheel.cs" />
     <Compile Include="NativeWheelOrganizerScript.cs" />
     <Compile Include="Helpers\PathHelper.cs" />

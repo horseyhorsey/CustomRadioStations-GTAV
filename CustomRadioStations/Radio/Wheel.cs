@@ -18,13 +18,6 @@ namespace SelectorWheel
     public delegate void WheelCloseEvent(Wheel sender, WheelCategory selectedCategory, WheelCategoryItem selectedItem);
     public delegate void WheelItemTrigger(Wheel sender, WheelCategory selectedCategory, WheelCategoryItem selectedItem);
 
-    public enum GoTo
-    {
-        Prev,
-        Next,
-        Same
-    }
-
     public class Wheel
     {
         public string WheelName { get; set; }
@@ -340,21 +333,21 @@ namespace SelectorWheel
                     /*Load textures into cache*/
                     if (cat.CategoryTexture != null)
                     {
-                        cat.CategoryTexture.LoadTexture();
+                        cat.CategoryTexture.StopDraw();
                     }
                     if (cat.BackgroundTexture != null)
                     {
-                        cat.BackgroundTexture.LoadTexture();
+                        cat.BackgroundTexture.StopDraw();
                     }
                     if (cat.HighlightTexture != null)
                     {
-                        cat.HighlightTexture.LoadTexture();
+                        cat.HighlightTexture.StopDraw();
                     }
                     foreach (var item in cat.ItemList)
                     {
                         if (item.ItemTexture != null)
                         {
-                            item.ItemTexture.LoadTexture();
+                            item.ItemTexture.StopDraw();
                         }
                     }
                 }
