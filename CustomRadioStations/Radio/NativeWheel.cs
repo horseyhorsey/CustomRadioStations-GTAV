@@ -2,6 +2,7 @@
 
 namespace CustomRadioStations
 {
+    /// <summary> Native to the game radio station wheel which has child NativeWheels </summary>
     class NativeWheel
     {
         public string Name;
