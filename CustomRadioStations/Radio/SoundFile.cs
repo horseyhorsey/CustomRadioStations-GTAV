@@ -110,6 +110,9 @@ namespace CustomRadioStations
             return false;
         }
 
+        /// <summary> Creates a tracklist from the contents of a station.ini <para/>
+        /// Lines must start with time 00:00:00 with artist and title delimited with ||</summary>
+        /// <param name="inputFromINI"></param>
         private void CreateTracklist(string inputFromINI)
         {
             if (uint.TryParse(inputFromINI.Substring(0, 2), out uint h)
@@ -298,10 +301,7 @@ namespace CustomRadioStations
         /// Else returns position in milliseconds.
         /// </summary>
         /// <returns></returns>
-        public uint PlayPosition()
-        {
-            return Sound.PlayPosition;
-        }
+        public uint PlayPosition() => Sound.PlayPosition;
 
         // 3D Sound stuff only
         /*public void ProcessSound(Vector3 sourcePosition)

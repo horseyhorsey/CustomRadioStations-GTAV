@@ -75,12 +75,16 @@
     <Compile Include="Helpers\GeneralHelper.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Helpers\Scaleform.cs" />
-    <Compile Include="Radio\SelectorWheel.cs" />
+    <Compile Include="Radio\Wheel.cs" />
     <Compile Include="Configuration\Settings.cs" />
-    <Compile Include="Audio\SoundFile.cs" />
+    <Compile Include="Radio\SoundFile.cs" />
     <Compile Include="Radio\StationWheelPair.cs" />
+    <Compile Include="Radio\Texture.cs" />
     <Compile Include="Radio\Track.cs" />
     <Compile Include="Helpers\UsedVehiclesManager.cs" />
+    <Compile Include="Helpers\UIHelper.cs" />
+    <Compile Include="Radio\WheelCategory.cs" />
+    <Compile Include="Radio\WheelCategoryItem.cs" />
     <Compile Include="Radio\WheelVars.cs" />
   </ItemGroup>
   <ItemGroup>
