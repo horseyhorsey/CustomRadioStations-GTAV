@@ -9,9 +9,6 @@ namespace CustomRadioStations
 {
     public class NativeWheelOrganizerScript : Script
     {
-        const string logPath = "scripts\\Custom Radio Stations\\NativeStations.log";
-        const string orgList = "scripts\\Custom Radio Stations\\NativeWheels.cfg";
-
         NativeWheel currentWheel;
 
         List<string> validStationNames;
@@ -47,14 +44,14 @@ namespace CustomRadioStations
 
         void LogAllStations()
         {
-            Logger.Init(logPath);
+            Logger.Init(Constants.NLOG_PATH);
 
-            Logger.Log("Game version: " + Game.Version.ToString(), logPath);
+            Logger.Log("Game version: " + Game.Version.ToString(), Constants.NLOG_PATH);
             if ((int)Game.Version < (int)GameVersion.v1_0_1493_1_Steam)
                 Logger.Log("WARNING: Can't use the native radio wheel organizer on this game version. " +
                     "Please update to 1.0.1493.0 or higher.");
 
-            Logger.Log("Checking all native and add-on radios...", logPath);
+            Logger.Log("Checking all native and add-on radios...", Constants.NLOG_PATH);
 
             maxStationCount = RadioNativeFunctions._MAX_RADIO_STATION_INDEX();
 
@@ -65,17 +62,17 @@ namespace CustomRadioStations
                 string stationName = RadioNativeFunctions.GET_RADIO_STATION_NAME(i);
                 validStationNames.Add(stationName);
                 string s = "Name: " + stationName + " || Proper name: " + RadioNativeFunctions.GetRadioStationProperName(i);
-                Logger.Log(s, logPath);
+                Logger.Log(s, Constants.NLOG_PATH);
             }
 
-            Logger.Log("Please use the 'Name' name for your wheel organization lists (NativeWheels.cfg)! 'Proper name' is only for display purposes.", logPath);
+            Logger.Log("Please use the 'Name' name for your wheel organization lists (NativeWheels.cfg)! 'Proper name' is only for display purposes.", Constants.NLOG_PATH);
         }
 
         void GetOrganizationLists()
         {
-            if (!File.Exists(orgList)) return;
+            if (!File.Exists(Constants.NLOG_CFG_PATH)) return;
             
-            string[] lines = File.ReadAllLines(orgList);
+            string[] lines = File.ReadAllLines(Constants.NLOG_CFG_PATH);
 
             bool lastLineWasWheelName = false;
 
