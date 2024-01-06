@@ -164,12 +164,6 @@ namespace SelectorWheel
 
             return percent * height;
         }
-
-        public static string MakeValidFileName(string original, char replacementChar = '_')
-        {
-            var invalidChars = new HashSet<char>(System.IO.Path.GetInvalidFileNameChars());
-            return new string(original.Select(c => invalidChars.Contains(c) ? replacementChar : c).ToArray());
-        }
         
         public static float AspectRatio { get; private set; } = Function.Call<float>(Hash.GET_SCREEN_ASPECT_RATIO, true);
 
