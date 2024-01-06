@@ -76,6 +76,8 @@
     <Compile Include="Helpers\GeneralHelper.cs" />
     <Compile Include="Configuration\Config.cs" />
     <Compile Include="Helpers\Scaleform.cs" />
+    <Compile Include="Radio\SoundFileTimePair.cs" />
+    <Compile Include="Radio\SoundHelperIK.cs" />
     <Compile Include="Radio\Wheel.cs" />
     <Compile Include="Configuration\Settings.cs" />
     <Compile Include="Radio\SoundFile.cs" />

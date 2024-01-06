@@ -1,5 +1,4 @@
 ﻿using GTA;
-using GTA.Math;
 using IrrKlang;
 using System.IO;
 using System.Collections.Generic;
@@ -8,6 +7,7 @@ using System;
 
 namespace CustomRadioStations
 {
+    /// <summary> Soundfile utilizing the IrrKlang library</summary>
     class SoundFile
     {
         public ISound Sound;
@@ -346,14 +346,6 @@ namespace CustomRadioStations
         {
             SoundEngine.StopAllSounds();
             SoundEngine.Dispose();
-        }
-    }
-
-    static class SoundHelperIK
-    {
-        public static Vector3D Vector3ToVector3D(Vector3 vec)
-        {
-            return new Vector3D(vec.X, vec.Z, vec.Y);
         }
     }
 }
