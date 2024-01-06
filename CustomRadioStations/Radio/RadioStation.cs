@@ -27,7 +27,7 @@ namespace CustomRadioStations
         uint stoppedPositionStation;
         DateTime trackUpdateTimer = DateTime.Now;
 
-        /// <summary> Goes through every file and will either add a commercial or a SountFileTimePair <para/>
+        /// <summary> Goes through every file and will either add a commercial or a SoundFileTimePair <para/>
         /// files can be shortcut .lnk and files can be prefixed with [Commercial]</summary>
         /// <param name="correspondingWheelCategory"></param>
         /// <param name="songFilesPaths">file paths</param>

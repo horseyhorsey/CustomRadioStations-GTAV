@@ -24,7 +24,8 @@ namespace CustomRadioStations
         //public float MaximumDistance = 20f;
         //public float MinimumDistance = 1f;
 
-        /// <summary> Adds the klang sound source from a file path <para/>
+        /// <summary> Adds the klang sound source from a file path. The sound file is not automatically loaded into memory, only when play() is called. <para/>
+        /// Larger files will make game stall (above 200mb espeically noticable) <para/>
         /// To be more flexible playing back sounds, irrKlang uses the concept of sound sources.
         /// A sound source can be simply the name of a sound file, such as "sound.wav".
         /// It is possible to add "sound.wav" as sound source to irrKlang, and play it using the sound source pointer:</summary>
