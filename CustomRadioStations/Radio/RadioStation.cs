@@ -27,6 +27,10 @@ namespace CustomRadioStations
         uint stoppedPositionStation;
         DateTime trackUpdateTimer = DateTime.Now;
 
+        /// <summary> Goes through every file and will either add a commercial or a SountFileTimePair <para/>
+        /// files can be shortcut .lnk and files can be prefixed with [Commercial]</summary>
+        /// <param name="correspondingWheelCategory"></param>
+        /// <param name="songFilesPaths">file paths</param>
         public RadioStation(WheelCategory correspondingWheelCategory, IEnumerable<string> songFilesPaths)
         {
             corrWheelCat = correspondingWheelCategory;
@@ -78,6 +82,7 @@ namespace CustomRadioStations
             }
 
             ShuffleList(); // Do this based on an ini setting? Yes. TODO
+
             InsertCommercials(commercials);
 
             // Calculate lengths and stuff for the station

@@ -15,6 +15,7 @@ namespace CustomRadioStations
         public string FileName;
         public string FilePath;
         public bool HasTrackList;
+        /// <summary>https://www.ambiera.com/irrklang/docu/index.html#soundSources</summary>
         public ISound Sound;
         public ISoundEffectControl SoundEffect;
         public ISoundSource Source;
@@ -23,7 +24,10 @@ namespace CustomRadioStations
         //public float MaximumDistance = 20f;
         //public float MinimumDistance = 1f;
 
-        /// <summary> Adds the klang sound source from a file path </summary>
+        /// <summary> Adds the klang sound source from a file path <para/>
+        /// To be more flexible playing back sounds, irrKlang uses the concept of sound sources.
+        /// A sound source can be simply the name of a sound file, such as "sound.wav".
+        /// It is possible to add "sound.wav" as sound source to irrKlang, and play it using the sound source pointer:</summary>
         /// <param name="filepath"></param>
         public SoundFile(string filepath)
         {
