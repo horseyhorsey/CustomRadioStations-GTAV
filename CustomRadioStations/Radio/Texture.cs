@@ -8,58 +8,32 @@ namespace SelectorWheel
 {
     public class Texture
     {
-        public string Path { get; set; }
-        public int Index { get; set; }
-        public int DrawLevel { get; set; }
-
+        private static readonly Dictionary<string, int> _textures = new Dictionary<string, int>();
         public Texture(string path, int index)
         {
             Path = path;
             Index = index;
         }
 
-        public void Draw(int level, int time, Point pos, Size size)
-        {
-            DrawTexture(Path, Index, level, time, pos, size);
-        }
+        public int DrawLevel { get; }
+        public int Index { get; }
+        public string Path { get; }
 
-        public void Draw(int level, int time, Point pos, Size size, float rotation, Color color)
-        {
-            DrawTexture(Path, Index, level, time, pos, size, rotation, color);
-        }
-
-        public void Draw(int level, int time, Point pos, PointF center, Size size, float rotation, Color color)
-        {
-            DrawTexture(Path, Index, level, time, pos, center, size, rotation, color);
-        }
-
-        public void Draw(int level, int time, Point pos, PointF center, Size size, float rotation, Color color, float aspectRatio)
-        {
-            DrawTexture(Path, Index, level, time, pos, center, size, rotation, color, aspectRatio);
-        }
-
-        public void LoadTexture()
-        {
-            StopDraw();
-        }
-        
-        public void StopDraw()
-        {
-            DrawTexture(Path, Index, 1, 0, new Point(1280, 720), new Size(0, 0));
-        }
+        /// <summary>
+        /// Creates a texture. Texture deletion is performed automatically when game reloads scripts.
+        /// Can be called only in the same thread as natives.
+        /// </summary>
+        /// <param name="filename"></param>
+        /// <returns>Internal texture ID.</returns>
+        [SuppressUnmanagedCodeSecurity]
+        [DllImport("ScriptHookV.dll", ExactSpelling = true, EntryPoint = "?createTexture@@YAHPEBD@Z")]
+        public static extern int CreateTexture([MarshalAs(UnmanagedType.LPStr)] string filename);
 
         public static void DrawTexture(string filename, int index, int level, int time, Point pos, Size size)
         {
             DrawTexture(filename, index, level, time, pos, new PointF(0.0f, 0.0f), size, 0.0f, Color.White, 1.0f);
         }
-        public static void DrawTexture(string filename, int index, int level, int time, Point pos, Size size, float rotation, Color color)
-        {
-            DrawTexture(filename, index, level, time, pos, new PointF(0.0f, 0.0f), size, rotation, color, 1.0f);
-        }
-        public static void DrawTexture(string filename, int index, int level, int time, Point pos, PointF center, Size size, float rotation, Color color)
-        {
-            DrawTexture(filename, index, level, time, pos, center, size, rotation, color, 1.0f);
-        }
+
         public static void DrawTexture(string filename, int index, int level, int time, Point pos, PointF center, Size size, float rotation, Color color, float aspectRatio)
         {
             if (!File.Exists(filename))
@@ -88,18 +62,6 @@ namespace SelectorWheel
             DrawTexture(id, index, level, time, w, h, center.X, center.Y, x, y, rotation, aspectRatio, color.R / 255.0f, color.G / 255.0f, color.B / 255.0f, color.A / 255.0f);
         }
 
-        private static readonly Dictionary<string, int> _textures = new Dictionary<string, int>();
-
-        /// <summary>
-        /// Creates a texture. Texture deletion is performed automatically when game reloads scripts.
-        /// Can be called only in the same thread as natives.
-        /// </summary>
-        /// <param name="filename"></param>
-        /// <returns>Internal texture ID.</returns>
-        [SuppressUnmanagedCodeSecurity]
-        [DllImport("ScriptHookV.dll", ExactSpelling = true, EntryPoint = "?createTexture@@YAHPEBD@Z")]
-        public static extern int CreateTexture([MarshalAs(UnmanagedType.LPStr)] string filename);
-
         /// <summary>
         /// Draws a texture on screen. Can be called only in the same thread as natives.
         /// </summary>
@@ -122,5 +84,13 @@ namespace SelectorWheel
         [SuppressUnmanagedCodeSecurity]
         [DllImport("ScriptHookV.dll", ExactSpelling = true, EntryPoint = "?drawTexture@@YAXHHHHMMMMMMMMMMMM@Z")]
         public static extern void DrawTexture(int id, int instance, int level, int time, float sizeX, float sizeY, float centerX, float centerY, float posX, float posY, float rotation, float scaleFactor, float colorR, float colorG, float colorB, float colorA);
+
+        public void Draw(int level, int time, Point pos, PointF center, Size size, float rotation, Color color, float aspectRatio)
+        {
+            DrawTexture(Path, Index, level, time, pos, center, size, rotation, color, aspectRatio);
+        }
+
+        /// <summary> Draws texture</summary>
+        public void StopDraw() => DrawTexture(Path, Index, 1, 0, new Point(1280, 720), new Size(0, 0));
     }
 }
