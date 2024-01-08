@@ -1,0 +1,136 @@
+﻿{
+  "WheelCats": [
+    {
+      "name": "dnb",
+      "displayName": "Drum n Bass, Jungle",
+      "desc": "Internet radios",
+      "stations": [
+        {
+          "name": "dnbradio",
+          "desc": "=~italic~\"We are one of the longest-running, most sought out places for drum & bass! Get involved!!\" ~italic~ ~n~ ~y~DnB opens your eyes ~o~ (DnbRadio)",
+          "type": "net",
+          "url": "https://dnbradio.nl/dnbradio_main.mp3",
+          "formats": [ "mp3" ]
+        },
+        {
+          "name": "dnbstation",
+          "desc": "=~italic~\"Drum n Bass Station\" ~italic~ ~n~ ~y~ ~o~ (DnB Station)",
+          "type": "net",
+          "url": "http://dnbstation.com:8005/listen.mp3"
+        },
+        {
+          "name": "renedageradio",
+          "desc": "=~italic~\"Renegade Radio\" ~italic~ ~n~ ~y~ ~o~ (Renegade)",
+          "type": "net",
+          "url": "https://streaming06.liveboxstream.uk/proxy/renegade/stream"
+        },
+        {
+          "name": "ukbass",
+          "desc": "=~italic~\"UK Bass Radio Southampton UK\" ~italic~ ~n~ ~y~ ~o~ (UK BASS)",
+          "type": "net",
+          "url": "https://s2.ssl-stream.com/listen/uk_bass_radio/stream?nocache=1704716760"
+        },
+        {
+          "name": "undergroundbass",
+          "desc": "=~italic~\"Underground Bass\" ~italic~ ~n~ ~y~ ~o~ (UG Bass UK)",
+          "type": "net",
+          "url": "http://65.108.124.70:7200/stream"
+        },
+        {
+          "name": "drumbase",
+          "desc": "=~italic~\"Drum base space\" ~italic~ ~n~ ~y~ ~o~ (Drum Base)",
+          "type": "net",
+          "url": "https://radio.drumbase.space/listen/drumbase.space/radio.mp3"
+        },
+        {
+          "name": "jungletrain",
+          "desc": "=~italic~\"Jungle Train\" ~italic~ ~n~ ~y~ ~o~ (Jungle Train)",
+          "type": "net",
+          "url": "http://stream5.jungletrain.net:8000/"
+        }
+      ]
+    },
+    {
+      "name": "garage",
+      "displayName": "UK Garage, House",
+      "desc": "Internet radios",
+      "stations": [
+        {
+          "name": "algorythme",
+          "type": "net",
+          "desc": "=~italic~\"House Garage Old Skool\" ~italic~ ~n~ ~y~UK Garage ~o~ (Algorythme)",
+          "url": "https://radio9.pro-fhi.net/flux-tybvgnpo/stream",
+          "formats": [ "mp3" ]
+        },
+        {
+          "name": "speedgarage",
+          "desc": "=~italic~\"UK Garage\" ~italic~ ~n~ ~y~ ~o~ (Speed Garage Mix)",
+          "type": "net",
+          "url": "https://djmonty01.jellycast.com/files/audio/This%20is%20Garage%20Best%20of%201997.mp3"
+        },
+        {
+          "name": "housenation",
+          "desc": "=~italic~\"HouseNationUK Radio\" ~italic~ ~n~ ~y~ ~o~ (House Nation UK)",
+          "type": "net",
+          "url": "https://streaming.radio.co/s06bd9d805/listen"
+        },
+        {
+          "name": "passage",
+          "desc": "=~italic~\"Passage Radio\" ~italic~ ~n~ ~y~ ~o~ (Garage House)",
+          "type": "net",
+          "url": "https://s10.citrus3.com:8478/stream"
+        }
+      ]
+    },
+    {
+      "name": "boogie",
+      "stations": [
+        {
+          "name": "fantasyradio",
+          "desc": "=~italic~\"Italo-Disco classics\" ~italic~ ~n~ ~y~ Groovy ~o~ (Fantasy Radio)",
+          "type": "net",
+          "url": "http://italo.live-streams.nl:8000/stream",
+          "formats": [ "mp3" ]
+        },
+        {
+          "name": "FM80",
+          "desc": "=~italic~\"FM80 classic rare grooves, disco, post disco, boogie, soul\" ~italic~ ~n~ ~y~Get down on it~o~ (FM80)",
+          "type": "net",
+          "url": "https://listen.radioking.com/radio/467555/stream/523739",
+          "formats": [ "mp3" ]
+        },
+        {
+          "name": "partyshack",
+          "desc": "=~italic~\"The Party Shack - Sounds of the 50s & 60s Radio Show\" ~italic~ ~n~ ~y~ ~o~ (Party Shack)",
+          "type": "net",
+          "url": "https://listen.radioking.com/radio/618901/stream/680905"
+        },
+        {
+          "name": "the80s",
+          "desc": "=~italic~\"A selection of hits that made the Australian charts during the 80's. Includes local and overseas artists.\" ~italic~ ~n~ ~y~ ~o~ (DnbRadio)",
+          "type": "net",
+          "url": "https://listen.radioking.com/radio/491938/stream/550183"
+        },
+        {
+          "name": "ozpunk",
+          "desc": "=~italic~\"Oz Punk Radio - 100% Grassroots Aussie Punk Rock 24/7\" ~italic~ ~n~ ~y~ ~o~ (Oz Punk)",
+          "type": "net",
+          "url": "https://listen.radioking.com/radio/604375/stream/665779"
+        },
+        {
+          "name": "chilllover",
+          "desc": "=~italic~\"Chill Lover Radio  whose goal is to feature and promote independent artists across all genres including talk radio.\" ~italic~ ~n~ ~y~ ~o~ (Oz Punk)",
+          "type": "net",
+          "url": "https://listen.radioking.com/radio/364117/stream/415060"
+        },
+        {
+          "name": "classics",
+          "desc": "=~italic~\"Classic 70s 80s\" ~italic~ ~n~ ~y~ ~o~ (Oz Punk)",
+          "type": "net",
+          "url": "https://listen.radioking.com/radio/248953/stream/293236"
+        }
+
+      ]
+    }
+  ]
+}
