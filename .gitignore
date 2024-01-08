@@ -328,3 +328,6 @@ ASALocalRun/
 
 # MFractors (Xamarin productivity tool) working folder 
 .mfractor/
+/Client/wwwroot/js/howler.spatial.min.js
+/Client/wwwroot/js/howler.core.min.js
+/Client/wwwroot/js/howler.min.js
